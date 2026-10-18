@@ -1,0 +1,11 @@
+{
+  "name": "understand-this-video",
+  "displayName": "Understand This Video For Me AI Plugin",
+  "description": "Let your AI watch and hear a local video or YouTube/Vimeo/Loom link: key frames, timestamped transcript and a contact sheet, processed locally.",
+  "version": "1.0.1",
+  "author": {"name": "Africa App Studio", "email": "africa.app.studio@gmail.com"},
+  "homepage": "https://africaappstudio-max.github.io/video-context-ai/",
+  "repository": "https://github.com/africaappstudio-max/understand-this-video-mcp",
+  "license": "SEE LICENSE IN LICENSE",
+  "mcpServers": "./.mcp.json"
+}

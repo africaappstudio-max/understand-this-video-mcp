@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "Understand This Video For Me": {
+      "command": "~/.video-context/app/bin/understand-this-video-mcp",
+      "args": []
+    }
+  }
+}
