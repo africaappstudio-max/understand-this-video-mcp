@@ -13,7 +13,7 @@ Everything runs **100% on your computer**. Your videos never leave it.
 
 ## Price
 **$49 one-time. Lifetime licence, up to 3 of your devices.** No subscription.
-Buy: https://africaappstudio-max.github.io/video-context-ai/
+Buy: https://understandvideo.shipmonthly.com
 
 No refunds for change of mind. If it won't work on your computer, email me within 7 days and I'll fix it or refund you.
 
@@ -42,8 +42,8 @@ Activate: `understand-this-video activate YOUR-KEY`. Internet is needed once to 
 Videos are processed locally. The only network call is the licence check with Freemius. See [PRIVACY.md](PRIVACY.md).
 
 ## Support
-africa.app.studio@gmail.com
+video@shipmonthly.com
 
 Demo video used on the website: "The Babbling Brooke" (YouTube zLTDLeDRrw4), CC BY.
 
-Proprietary software © 2026 Africa App Studio. The source is visible, but use needs a paid licence. See [LICENSE](LICENSE).
+Proprietary software © 2026 Ship Monthly. The source is visible, but use needs a paid licence. See [LICENSE](LICENSE).

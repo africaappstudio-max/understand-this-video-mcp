@@ -6,4 +6,4 @@
 - **No analytics, no tracking, no ads.** We don't collect or sell personal data.
 - Purchases are handled by Freemius under their privacy policy.
 
-Contact: africa.app.studio@gmail.com · Africa App Studio, Uganda · Last updated 18 October 2026
+Contact: video@shipmonthly.com · Ship Monthly · Last updated 18 October 2026
