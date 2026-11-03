@@ -5,12 +5,12 @@
   "description": "Let your AI watch and hear a video: key frames, transcript and contact sheet, processed locally.",
   "repository": {"url": "https://github.com/africaappstudio-max/understand-this-video-mcp", "source": "github"},
   "websiteUrl": "https://understandvideo.shipmonthly.com",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "packages": [{
     "registryType": "mcpb",
-    "identifier": "https://github.com/africaappstudio-max/understand-this-video-mcp/releases/download/v1.0.1/understand-this-video.mcpb",
-    "version": "1.0.1",
-    "fileSha256": "ba7db026a32e603e209443513495b5cad4b112f6e072a363548547cf12fcbbd1",
+    "identifier": "https://github.com/africaappstudio-max/understand-this-video-mcp/releases/download/v1.0.2/understand-this-video.mcpb",
+    "version": "1.0.2",
+    "fileSha256": "22b57f339deaebe86380b9dae37cb922a30278c334ee1a681ff0db06f6bbe7b4",
     "transport": {"type": "stdio"}
   }]
 }

@@ -2,7 +2,7 @@
   "manifest_version": "0.2",
   "name": "understand-this-video",
   "display_name": "Understand This Video For Me AI Plugin",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Let your AI watch and hear a video: key frames, transcript and contact sheet, processed locally.",
   "long_description": "Give your AI a local video file or a YouTube/Vimeo/Loom link. It gets timestamped key frames, a transcript (site captions, or local Whisper when installed) and a contact-sheet image. Requires ffmpeg and a $49 lifetime licence.",
   "author": {"name": "Ship Monthly", "email": "video@shipmonthly.com", "url": "https://understandvideo.shipmonthly.com"},
