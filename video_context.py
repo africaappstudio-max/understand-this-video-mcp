@@ -256,13 +256,14 @@ def is_url(s):
 
 
 def _ytdlp_cmd():
-    if shutil.which("yt-dlp"):
-        return ["yt-dlp"]
     try:
         import yt_dlp  # type: ignore  # noqa: F401
         return [sys.executable, "-m", "yt_dlp"]
     except ImportError:
-        return None
+        pass
+    if shutil.which("yt-dlp"):
+        return ["yt-dlp"]
+    return None
 
 
 def parse_vtt(path):
@@ -273,19 +274,25 @@ def parse_vtt(path):
         while len(parts) < 3:
             parts.insert(0, 0.0)
         return parts[0] * 3600 + parts[1] * 60 + parts[2]
-    segs, seen = [], set()
+    segs, prev = [], set()
     blocks = open(path, encoding="utf-8", errors="replace").read().split("\n\n")
     for b in blocks:
         lines = [l for l in b.strip().splitlines() if l.strip()]
         for i, l in enumerate(lines):
             m = re.match(r"([\d:.,]+)\s*-->\s*([\d:.,]+)", l)
             if m:
-                text = " ".join(re.sub(r"<[^>]+>", "", t).strip() for t in lines[i + 1:])
-                text = re.sub(r"\s+", " ", text).strip()
-                for line in [text]:
-                    if line and line not in seen:
-                        seen.add(line)
-                        segs.append((ts(m.group(1)), ts(m.group(2)), line))
+                start, end = ts(m.group(1)), ts(m.group(2))
+                texts = []
+                for t in lines[i + 1:]:
+                    t = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", t)).strip()
+                    if t:
+                        texts.append(t)
+                # Auto-captions repeat the previous line in every cue (rolling captions):
+                # keep only the lines that are new compared with the cue before.
+                new_lines = [t for t in texts if t not in prev]
+                prev = set(texts)
+                if new_lines and end - start >= 0.05:
+                    segs.append((start, end, " ".join(new_lines)))
                 break
     return segs
 
@@ -294,8 +301,10 @@ def fetch_url(url, work, max_height, want_subs, sub_lang, cookies=None):
     """Download a URL with yt-dlp. Returns (video_path, title, caption_segments)."""
     cmd = _ytdlp_cmd()
     if cmd is None:
-        sys.stderr.write("ERROR: URL input needs yt-dlp. Install: pip install yt-dlp "
-                         "(macOS: brew install yt-dlp)\n")
+        sys.stderr.write("ERROR: Links (YouTube etc.) need a free helper called yt-dlp. Install it, then try again:\n"
+                         "  macOS:   brew install yt-dlp\n"
+                         "  Windows: winget install yt-dlp\n"
+                         "Or download the video yourself and give me the file instead.\n")
         sys.exit(3)
     work.mkdir(parents=True, exist_ok=True)
     base = cmd + ["--no-playlist", "--no-progress", "-o", str(work / "source.%(ext)s")]
@@ -513,7 +522,7 @@ def main(argv=None):
     try:
         licensing.require_license()
     except licensing.LicenseError as e:
-        sys.stderr.write("Licence error: %s\n" % e)
+        sys.stderr.write("License error: %s\n" % e)
         sys.exit(5)
     build(make_parser().parse_args(argv))
 

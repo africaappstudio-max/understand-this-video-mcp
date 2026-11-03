@@ -10,8 +10,8 @@ description: Let an AI "watch" a video. Turns a local video file or a URL (YouTu
 - Your model reads images and text but not video.
 
 ## Requirements
-- An Understand This Video For Me licence (activated once by the installer, or `understand-this-video activate KEY`).
-  Exit code 5 / "Licence error" means not activated: tell the user to activate, don't retry.
+- An Understand This Video For Me license (activated once by the installer, or `understand-this-video activate KEY`).
+  Exit code 5 / "License error" means not activated: tell the user to activate, don't retry.
 - `ffmpeg` + `ffprobe` (found on PATH or in /opt/homebrew/bin, /usr/local/bin) (macOS `brew install ffmpeg`, Ubuntu `sudo apt install ffmpeg`, Windows `winget install ffmpeg`).
 - Python 3.9+. Installed by `install.sh` / `install.ps1` (ffmpeg, faster-whisper, yt-dlp).
 
@@ -23,7 +23,7 @@ understand-this-video "<file or URL>" --scene --out understand_this_video_output
 Useful flags: `--max-frames 20`, `--min-frames 8`, `--whisper-model small` (falls back to base),
 `--language en` (default auto-detect), `--no-transcript`, `--no-captions`, `--wav`, `--no-audio`,
 `--no-sheet`, `--cookies-from-browser chrome` (sites that block downloads), `--keep-video`.
-Exit codes: 2 = ffmpeg missing, 3 = yt-dlp missing for URL, 4 = download blocked, 5 = licence.
+Exit codes: 2 = ffmpeg missing, 3 = yt-dlp missing for URL, 4 = download blocked, 5 = license.
 
 ## Reading the output (do this in order)
 1. `context.md` — ONE file: header (duration, transcript source, language) and a timeline

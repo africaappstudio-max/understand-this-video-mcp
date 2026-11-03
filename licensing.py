@@ -1,4 +1,4 @@
-"""Licence-key check for Understand This Video For Me AI Plugin (Freemius or Lemon Squeezy licence APIs).
+"""License-key check for Understand This Video For Me AI Plugin (Freemius or Lemon Squeezy license APIs).
 
 First use: key is activated online (one activation per machine) and cached in
 ~/.video-context/license.json. Afterwards it works offline; it re-validates
@@ -64,7 +64,7 @@ def _post(endpoint, data):
         try:
             return json.loads(e.read().decode())
         except Exception:
-            raise LicenseError("licence server error %s" % e.code)
+            raise LicenseError("license server error %s" % e.code)
 
 
 def _check_product(resp):
@@ -113,7 +113,7 @@ def _fs(method, path, body=None, query=None):
         except Exception:
             err = {}
         msg = (err.get("error") or {}).get("message") if isinstance(err.get("error"), dict) else err.get("error")
-        raise LicenseError(msg or "licence server error %s" % e.code)
+        raise LicenseError(msg or "license server error %s" % e.code)
 
 
 def _uid():
@@ -134,7 +134,7 @@ def _fs_activate(key):
                 {"uid": _uid(), "license_key": key,
                  "title": "%s (%s)" % (socket.gethostname(), platform.system())})
     except (urllib.error.URLError, socket.timeout, OSError) as e:
-        raise LicenseError("can't reach the licence server to activate (internet needed once): %s" % e)
+        raise LicenseError("can't reach the license server to activate (internet needed once): %s" % e)
     if not r.get("install_id"):
         raise LicenseError("activation failed")
     if r.get("license_plan_id") and str(r["license_plan_id"]) != str(FS_PLAN_ID):
@@ -161,7 +161,7 @@ def _ls_activate(key):
         r = _post("activate", {"license_key": key,
                                "instance_name": "%s (%s)" % (socket.gethostname(), platform.system())})
     except (urllib.error.URLError, socket.timeout, OSError) as e:
-        raise LicenseError("can't reach the licence server to activate (internet needed once): %s" % e)
+        raise LicenseError("can't reach the license server to activate (internet needed once): %s" % e)
     if not r.get("activated"):
         raise LicenseError(r.get("error") or "activation failed")
     _check_product(r)
@@ -192,7 +192,7 @@ def require_license():
     d = _load()
     if d is None or (env_key and env_key != d.get("key")):
         if not env_key:
-            raise LicenseError("no licence key. Buy at %s then run: understand-this-video activate YOUR-KEY"
+            raise LicenseError("no license key. Buy at %s then run: understand-this-video activate YOUR-KEY (or paste the key into this app's settings for the plugin)"
                                % BUY_URL)
         activate(env_key)
         return
@@ -205,12 +205,12 @@ def require_license():
         except (urllib.error.URLError, socket.timeout, OSError):
             if age_days <= OFFLINE_GRACE_DAYS:
                 return
-            raise LicenseError("please connect to the internet once to re-check your licence")
+            raise LicenseError("please connect to the internet once to re-check your license")
         except LicenseError:
             ok = False
         if not ok:
             CACHE.unlink()
-            raise LicenseError("licence is no longer valid (cancelled/refunded). Contact support.")
+            raise LicenseError("license is no longer valid (cancelled/refunded). Contact support.")
         d["checked"] = time.time()
         _save(d)
         return
@@ -219,11 +219,11 @@ def require_license():
     except (urllib.error.URLError, socket.timeout, OSError, LicenseError):
         if age_days <= OFFLINE_GRACE_DAYS:
             return
-        raise LicenseError("please connect to the internet once to re-check your licence")
+        raise LicenseError("please connect to the internet once to re-check your license")
     status = (r.get("license_key") or {}).get("status")
     if not r.get("valid") or status in ("disabled", "expired"):
         CACHE.unlink()
-        raise LicenseError("licence is no longer valid (%s). Contact support." % (r.get("error") or status))
+        raise LicenseError("license is no longer valid (%s). Contact support." % (r.get("error") or status))
     _check_product(r)
     d["checked"] = time.time()
     _save(d)
@@ -239,7 +239,7 @@ def cli(argv):
             r = activate(argv[1])
             print("Activated. Thank you!")
         elif cmd == "deactivate":
-            print("Deactivated this machine." if deactivate() else "No licence on this machine.")
+            print("Deactivated this machine." if deactivate() else "No license on this machine.")
         elif cmd == "license-status":
             d = _load()
             print("Licensed (%s), last checked %s" % (d["key"][:8] + "...",
@@ -247,6 +247,6 @@ def cli(argv):
         else:
             return False
     except LicenseError as e:
-        sys.stderr.write("Licence error: %s\n" % e)
+        sys.stderr.write("License error: %s\n" % e)
         sys.exit(5)
     return True

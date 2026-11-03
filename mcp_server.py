@@ -53,7 +53,7 @@ def call_tool(args):
     try:
         licensing.require_license()
     except licensing.LicenseError as e:
-        return {"isError": True, "content": [{"type": "text", "text": "Licence error: %s" % e}]}
+        return {"isError": True, "content": [{"type": "text", "text": "License error: %s" % e}]}
     src = args.get("source")
     if not src or not str(src).strip():
         return _err("Understand This Video For Me: no video given. Pass a file path or URL as 'source'.")
@@ -85,7 +85,7 @@ def handle(msg):
     if method == "initialize":
         res = {"protocolVersion": msg.get("params", {}).get("protocolVersion", PROTOCOL),
                "capabilities": {"tools": {}},
-               "serverInfo": {"name": "understand-this-video", "title": "Understand This Video For Me AI Plugin", "version": "1.0.2"}}
+               "serverInfo": {"name": "understand-this-video", "title": "Understand This Video For Me AI Plugin", "version": "1.0.3"}}
     elif method == "tools/list":
         res = {"tools": TOOLS}
     elif method == "tools/call":

@@ -31,7 +31,7 @@ echo "Registering with Claude Desktop and Cursor..."
 
 KEY="${VIDEO_CONTEXT_LICENSE_KEY:-}"
 if [ -z "$KEY" ] && [ -t 0 ]; then
-  read -r -p "Paste your licence key (from your purchase email): " KEY
+  read -r -p "Paste your license key (from your purchase email): " KEY
 fi
 if [ -n "$KEY" ]; then
   "$APP/bin/understand-this-video" activate "$KEY"

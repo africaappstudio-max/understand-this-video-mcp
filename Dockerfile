@@ -3,5 +3,5 @@ RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -r
 WORKDIR /app
 COPY . .
 RUN pip install --no-cache-dir .
-# Starts without a licence; the licence is checked only when the tool is called.
+# Starts without a license; the license is checked only when the tool is called.
 CMD ["understand-this-video-mcp"]

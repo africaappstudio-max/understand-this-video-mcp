@@ -37,8 +37,8 @@ Write-Host "Registering with Claude Desktop and Cursor..."
 & "$App\Scripts\python.exe" "$Here\register_mcp.py" "$App\Scripts\understand-this-video-mcp.exe"
 
 $Key = $env:VIDEO_CONTEXT_LICENSE_KEY
-if (-not $Key) { $Key = Read-Host "Paste your licence key (from your purchase email)" }
+if (-not $Key) { $Key = Read-Host "Paste your license key (from your purchase email)" }
 if ($Key) { & "$App\Scripts\understand-this-video.exe" activate $Key }
 else { Write-Host "Later, activate with: $App\Scripts\understand-this-video.exe activate YOUR-KEY" }
 Write-Host ""
-Write-Host "Done! Restart Claude Desktop / Cursor, then ask: 'Watch C:\path\video.mp4 and summarise it'."
+Write-Host "Done! Restart Claude Desktop / Cursor, then ask: 'Watch C:\path\video.mp4 and summarize it'."
