@@ -25,14 +25,14 @@ HIDDEN_ALIASES = ("video_context",)  # old name; still callable, never listed
 TOOLS = [{
     "name": "understand_this_video",
     "title": "Understand This Video For Me",
-    "description": ("Understand This Video For Me: lets the AI watch AND hear a video: extracts timestamped key frames, a transcript "
-                    "(site captions or local Whisper) and a contact-sheet image from a local "
-                    "file path or URL (YouTube, Vimeo, Loom, direct mp4...). Returns a timeline "
+    "description": ("Understand This Video For Me: lets the AI watch AND hear a local video file: extracts timestamped key frames, a transcript "
+                    "(local Whisper) and a contact-sheet image from a file path on your computer. "
+                    "It does not download videos from the internet. Returns a timeline "
                     "(context.md) plus the overview image; individual frames are on disk."),
     "inputSchema": {
         "type": "object",
         "properties": {
-            "source": {"type": "string", "description": "Local video path (e.g. ~/Desktop/My Video.mp4; spaces fine, no quotes needed) or URL"},
+            "source": {"type": "string", "description": "Local video file path (e.g. ~/Desktop/My Video.mp4; spaces fine, no quotes needed). URLs are not accepted."},
             "out": {"type": "string", "description": "Output folder (default: temp dir)"},
             "max_frames": {"type": "integer", "default": 20},
             "transcript": {"type": "boolean", "default": True},
@@ -56,7 +56,7 @@ def call_tool(args):
         return {"isError": True, "content": [{"type": "text", "text": "License error: %s" % e}]}
     src = args.get("source")
     if not src or not str(src).strip():
-        return _err("Understand This Video For Me: no video given. Pass a file path or URL as 'source'.")
+        return _err("Understand This Video For Me: no video given. Pass a local file path as 'source'.")
     out = os.path.expanduser(args.get("out") or "") or tempfile.mkdtemp(prefix="understand_this_video_")
     argv = [str(src), "--scene", "--out", out,
             "--max-frames", str(int(args.get("max_frames", 20)))]
@@ -85,7 +85,7 @@ def handle(msg):
     if method == "initialize":
         res = {"protocolVersion": msg.get("params", {}).get("protocolVersion", PROTOCOL),
                "capabilities": {"tools": {}},
-               "serverInfo": {"name": "understand-this-video", "title": "Understand This Video For Me AI Plugin", "version": "1.0.3"}}
+               "serverInfo": {"name": "understand-this-video", "title": "Understand This Video For Me AI Plugin", "version": "1.1.0"}}
     elif method == "tools/list":
         res = {"tools": TOOLS}
     elif method == "tools/call":

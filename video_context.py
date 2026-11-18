@@ -34,7 +34,7 @@ EXTRA_BIN_DIRS = ("/opt/homebrew/bin", "/usr/local/bin", "/opt/local/bin", "/usr
 
 def ensure_path():
     """GUI apps (Claude Desktop, Cursor) start MCP servers with a minimal PATH, so add the
-    usual Homebrew/system bin dirs (and this venv's bin, for yt-dlp) to PATH."""
+    usual Homebrew/system bin dirs (and this venv's bin) to PATH."""
     cur = [d for d in os.environ.get("PATH", "").split(os.pathsep) if d]
     extra = [os.path.dirname(os.path.abspath(sys.executable))] + list(EXTRA_BIN_DIRS)
     add = [d for d in extra if d not in cur and os.path.isdir(d)]
@@ -255,90 +255,6 @@ def is_url(s):
     return bool(re.match(r"^https?://", s, re.I))
 
 
-def _ytdlp_cmd():
-    try:
-        import yt_dlp  # type: ignore  # noqa: F401
-        return [sys.executable, "-m", "yt_dlp"]
-    except ImportError:
-        pass
-    if shutil.which("yt-dlp"):
-        return ["yt-dlp"]
-    return None
-
-
-def parse_vtt(path):
-    """Parse WebVTT captions into [(start, end, text)], removing rolling duplicates."""
-    def ts(x):
-        parts = x.replace(",", ".").split(":")
-        parts = [float(p) for p in parts]
-        while len(parts) < 3:
-            parts.insert(0, 0.0)
-        return parts[0] * 3600 + parts[1] * 60 + parts[2]
-    segs, prev = [], set()
-    blocks = open(path, encoding="utf-8", errors="replace").read().split("\n\n")
-    for b in blocks:
-        lines = [l for l in b.strip().splitlines() if l.strip()]
-        for i, l in enumerate(lines):
-            m = re.match(r"([\d:.,]+)\s*-->\s*([\d:.,]+)", l)
-            if m:
-                start, end = ts(m.group(1)), ts(m.group(2))
-                texts = []
-                for t in lines[i + 1:]:
-                    t = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", t)).strip()
-                    if t:
-                        texts.append(t)
-                # Auto-captions repeat the previous line in every cue (rolling captions):
-                # keep only the lines that are new compared with the cue before.
-                new_lines = [t for t in texts if t not in prev]
-                prev = set(texts)
-                if new_lines and end - start >= 0.05:
-                    segs.append((start, end, " ".join(new_lines)))
-                break
-    return segs
-
-
-def fetch_url(url, work, max_height, want_subs, sub_lang, cookies=None):
-    """Download a URL with yt-dlp. Returns (video_path, title, caption_segments)."""
-    cmd = _ytdlp_cmd()
-    if cmd is None:
-        sys.stderr.write("ERROR: Links (YouTube etc.) need a free helper called yt-dlp. Install it, then try again:\n"
-                         "  macOS:   brew install yt-dlp\n"
-                         "  Windows: winget install yt-dlp\n"
-                         "Or download the video yourself and give me the file instead.\n")
-        sys.exit(3)
-    work.mkdir(parents=True, exist_ok=True)
-    base = cmd + ["--no-playlist", "--no-progress", "-o", str(work / "source.%(ext)s")]
-    if cookies:
-        base += ["--cookies-from-browser", cookies]
-    subs = []
-    if want_subs:
-        subprocess.run(base + ["--skip-download", "--write-subs", "--write-auto-subs",
-                               "--sub-langs", sub_lang, "--sub-format", "vtt", url],
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        vtts = sorted(work.glob("source*.vtt"))
-        if vtts:
-            subs = parse_vtt(vtts[0])
-    fmt_sel = ("bv*[height<=%d]+ba/b[height<=%d]/bv*+ba/b" % (max_height, max_height))
-    try:
-        run(base + ["-f", fmt_sel, "--merge-output-format", "mp4", url])
-    except RuntimeError as e:
-        msg = str(e)
-        hint = ""
-        if "Sign in" in msg or "429" in msg or "bot" in msg:
-            hint = ("\nHint: the site is rate-limiting/blocking this network. Retry with "
-                    "--cookies-from-browser chrome (or safari/firefox), or download the video "
-                    "yourself and pass the file path.")
-        sys.stderr.write("ERROR: download failed.%s\n%s\n" % (hint, msg[-800:]))
-        sys.exit(4)
-    vids = [p for p in work.glob("source.*") if p.suffix not in (".vtt", ".part")]
-    if not vids:
-        raise RuntimeError("yt-dlp produced no video file")
-    r = subprocess.run(cmd + ["--no-playlist", "--get-title", url],
-                       stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    title = r.stdout.decode(errors="replace").strip() or url
-    return vids[0], title, subs
-
-
 def contact_sheet(frames_dir, out_path, cols=4, cell=256):
     files = sorted(frames_dir.glob("frame_*.jpg"))
     if not files:
@@ -383,7 +299,7 @@ def make_parser():
     ap = argparse.ArgumentParser(prog="understand-this-video",
                                  description="Understand This Video For Me AI Plugin: turn a video "
                                              "into timestamped key frames + transcript for AI agents")
-    ap.add_argument("video", help="local video file or URL (YouTube, Vimeo, Loom, ... via yt-dlp)")
+    ap.add_argument("video", help="local video file path")
     ap.add_argument("--out", default="understand_this_video_output")
     ap.add_argument("--scene", action="store_true", help="scene detection (+interval fill if too few)")
     ap.add_argument("--threshold", type=float, default=0.3, help="scene threshold 0-1")
@@ -397,12 +313,7 @@ def make_parser():
     ap.add_argument("--no-transcript", action="store_true")
     ap.add_argument("--whisper-model", default="small", help="falls back to base if unavailable")
     ap.add_argument("--language", default=None, help="force language code (default: auto-detect)")
-    ap.add_argument("--no-captions", action="store_true", help="URL: ignore site captions, use whisper")
-    ap.add_argument("--sub-lang", default="en.*,en", help="URL: caption languages to try")
     ap.add_argument("--no-sheet", action="store_true", help="skip contact-sheet grid image")
-    ap.add_argument("--cookies-from-browser", default=None,
-                    help="URL: pass browser cookies to yt-dlp (e.g. chrome, safari, firefox)")
-    ap.add_argument("--keep-video", action="store_true", help="URL: keep downloaded video")
     return ap
 
 
@@ -413,16 +324,9 @@ def build(a):
     out = Path(os.path.expanduser(a.out))
     out.mkdir(parents=True, exist_ok=True)
     a.video = normalize_source(a.video)
-    source, title, caption_segs, dl_dir = a.video, os.path.basename(a.video), [], None
+    source, title = a.video, os.path.basename(a.video)
     if is_url(a.video):
-        dl_dir = out / "_download"
-        if dl_dir.exists():
-            shutil.rmtree(dl_dir)
-        print("Downloading with yt-dlp...")
-        vp, title, caption_segs = fetch_url(a.video, dl_dir, 480,
-                                            not (a.no_captions or a.no_transcript), a.sub_lang,
-                                            a.cookies_from_browser)
-        source = str(vp)
+        sys.exit("This plugin only processes video files on your computer. Download or export the video first, then give me the file path.")
     elif not os.path.isfile(source):
         sys.exit(missing_file_message(orig_source, source))
     duration, has_video, has_audio = probe(source)
@@ -457,10 +361,6 @@ def build(a):
     audio, tpath, segs, lang = None, None, [], None
     if a.no_transcript:
         note = "skipped (--no-transcript)"
-    elif caption_segs:
-        segs = caption_segs
-        tpath = _write_transcript(segs, out)
-        note = "site captions (yt-dlp)"
     elif not has_audio:
         note = "video has no audio stream"
     else:
@@ -476,13 +376,6 @@ def build(a):
             audio = None
     print("Audio: %s | Transcript: %s" % (audio.name if audio else "none", note))
     ctx = write_context_md(out, title, duration, frames, segs, lang, note, sheet)
-
-    if dl_dir is not None:
-        if a.keep_video:
-            for p in dl_dir.glob("source.*"):
-                if p.suffix != ".vtt":
-                    shutil.move(str(p), str(out / ("video" + p.suffix)))
-        shutil.rmtree(dl_dir, ignore_errors=True)
 
     instructions = ("Read context.md first: it interleaves timestamped frames and speech. "
                     "View the referenced frames (or contact_sheet.jpg for a one-image overview).")

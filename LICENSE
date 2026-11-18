@@ -10,8 +10,8 @@ Copyright (c) 2026 Ship Monthly. All rights reserved.
 3. **Ownership.** The software is licensed, not sold. All rights not granted are reserved.
 4. **Your data.** Videos are processed locally on your device. We receive only your license key
    and a device name/ID when the key is activated or re-checked.
-5. **Third-party tools.** ffmpeg, yt-dlp and Whisper are separate open-source projects under
-   their own licenses. You are responsible for having the right to download and process any video.
+5. **Third-party tools.** ffmpeg and Whisper are separate open-source projects under
+   their own licenses. You are responsible for having the right to process any video you give the plugin.
 6. **Refunds.** No refunds for change of mind. You get a refund only if the software won't install
    or run on your computer, you email video@shipmonthly.com within 7 days of purchase, and it
    can't be fixed within 48 hours. When refunded, the license key is switched off. No refunds for

@@ -3,14 +3,11 @@
   "name": "io.github.africaappstudio-max/understand-this-video",
   "title": "Understand This Video For Me AI Plugin",
   "description": "Let your AI watch and hear a video: key frames, transcript and contact sheet, processed locally.",
-  "repository": {"url": "https://github.com/africaappstudio-max/understand-this-video-mcp", "source": "github"},
+  "repository": {
+    "url": "https://github.com/africaappstudio-max/video-context-ai-download",
+    "source": "github"
+  },
   "websiteUrl": "https://understandvideo.shipmonthly.com",
-  "version": "1.0.3",
-  "packages": [{
-    "registryType": "mcpb",
-    "identifier": "https://github.com/africaappstudio-max/understand-this-video-mcp/releases/download/v1.0.3/understand-this-video.mcpb",
-    "version": "1.0.3",
-    "fileSha256": "70abb2d7b9621f847bc5197254e20601efed53aa57b4c65e1da35842fee71e32",
-    "transport": {"type": "stdio"}
-  }]
+  "version": "1.1.0",
+  "packages": []
 }
