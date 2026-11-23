@@ -21,7 +21,8 @@ description: Let an AI "watch" a video. Turns a local video file on the user's c
 understand-this-video "/path/to/video.mp4" --scene --out understand_this_video_output
 # or, if pip-installed:  understand-this-video "/path/to/video.mp4" --scene
 ```
-Useful flags: `--max-frames 20`, `--min-frames 8`, `--whisper-model small` (falls back to base),
+Defaults are token-light: 12 frames max, 512 px, quality 8. For speech-only videos use `--transcript-only` (no frames).
+Useful flags: `--max-frames 12`, `--min-frames 6`, `--max-side 512`, `--quality 8`, `--transcript-only`, `--whisper-model small` (falls back to base),
 `--language en` (default auto-detect), `--no-transcript`, `--wav`, `--no-audio`,
 `--no-sheet`.
 Exit codes: 2 = ffmpeg missing, 5 = license.

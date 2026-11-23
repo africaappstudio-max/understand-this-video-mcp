@@ -118,6 +118,9 @@ Run the installer first. Then open your app's MCP settings file and paste the sa
 ## Tool
 `understand_this_video`: input `source` (a local file path) plus optional options. Returns the frames as images, the transcript and the timeline. URLs are not accepted.
 
+**Token-friendly defaults (v1.2.0):** up to 12 key frames, 512 px on the longest side, moderate JPEG quality. Raise them with `max_frames` and `max_side` when you need more detail.
+**Transcript-only mode:** set `transcript_only: true` (CLI: `--transcript-only`) for the speech transcript with no frames or images. It is the cheapest option for talks, calls and lectures.
+
 ## Privacy
 Videos are processed locally. The plugin does not download videos from the internet. The only network call is the license check with Freemius (and a one-time download of the free Whisper speech model). See [PRIVACY.md](PRIVACY.md).
 

@@ -34,7 +34,10 @@ TOOLS = [{
         "properties": {
             "source": {"type": "string", "description": "Local video file path (e.g. ~/Desktop/My Video.mp4; spaces fine, no quotes needed). URLs are not accepted."},
             "out": {"type": "string", "description": "Output folder (default: temp dir)"},
-            "max_frames": {"type": "integer", "default": 20},
+            "max_frames": {"type": "integer", "default": 12, "description": "Max key frames (default 12; raise for more detail, costs more tokens)"},
+            "max_side": {"type": "integer", "default": 512, "description": "Longest frame side in px (default 512)"},
+            "transcript_only": {"type": "boolean", "default": False,
+                                "description": "Speech transcript only, no frames or images (cheapest)"},
             "transcript": {"type": "boolean", "default": True},
             "include_images": {"type": "boolean", "default": True,
                                "description": "Return contact sheet image inline"},
@@ -59,7 +62,10 @@ def call_tool(args):
         return _err("Understand This Video: no video given. Pass a local file path as 'source'.")
     out = os.path.expanduser(args.get("out") or "") or tempfile.mkdtemp(prefix="understand_this_video_")
     argv = [str(src), "--scene", "--out", out,
-            "--max-frames", str(int(args.get("max_frames", 20)))]
+            "--max-frames", str(int(args.get("max_frames", 12))),
+            "--max-side", str(int(args.get("max_side", 512)))]
+    if args.get("transcript_only"):
+        argv.append("--transcript-only")
     if not args.get("transcript", True):
         argv.append("--no-transcript")
     log = io.StringIO()
@@ -85,7 +91,7 @@ def handle(msg):
     if method == "initialize":
         res = {"protocolVersion": msg.get("params", {}).get("protocolVersion", PROTOCOL),
                "capabilities": {"tools": {}},
-               "serverInfo": {"name": "understand-this-video", "title": "Understand This Video Plugin", "version": "1.1.0"}}
+               "serverInfo": {"name": "understand-this-video", "title": "Understand This Video Plugin", "version": "1.2.0"}}
     elif method == "tools/list":
         res = {"tools": TOOLS}
     elif method == "tools/call":
